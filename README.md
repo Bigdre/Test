@@ -25,10 +25,24 @@ An MCP (Model Context Protocol) server that provides SSH capabilities, allowing 
 
 ## Installation
 
+### Option 1: Native Installation
+
 ```bash
 npm install
 npm run build
 ```
+
+### Option 2: Docker Installation
+
+```bash
+# Build the Docker image
+./docker-run.sh
+
+# Or manually
+docker build -t mcp-ssh-server:latest .
+```
+
+For detailed Docker instructions, see [DOCKER.md](DOCKER.md)
 
 ## Configuration
 
@@ -40,6 +54,8 @@ Add the following to your Claude Desktop config file:
 **Windows**: `%APPDATA%/Claude/claude_desktop_config.json`
 **Linux**: `~/.config/Claude/claude_desktop_config.json`
 
+#### Native Installation
+
 ```json
 {
   "mcpServers": {
@@ -50,6 +66,28 @@ Add the following to your Claude Desktop config file:
   }
 }
 ```
+
+#### Docker Installation
+
+```json
+{
+  "mcpServers": {
+    "ssh": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "--network=host",
+        "-v", "/Users/yourname/.ssh:/root/.ssh:ro",
+        "mcp-ssh-server:latest"
+      ]
+    }
+  }
+}
+```
+
+**Note**: Replace `/Users/yourname/.ssh` with your actual SSH directory path. See [DOCKER.md](DOCKER.md) for platform-specific instructions.
 
 ### Environment Setup
 

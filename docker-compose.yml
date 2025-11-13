@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  mcp-ssh-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mcp-ssh-server:latest
+    container_name: mcp-ssh-server
+
+    # The MCP server uses stdio for communication
+    # It will be invoked by Claude Desktop
+    stdin_open: true
+    tty: true
+
+    # Mount SSH keys from host (optional)
+    # Uncomment and adjust paths as needed
+    volumes:
+      # Mount your SSH keys for authentication
+      - ~/.ssh:/root/.ssh:ro
+      # Or mount specific keys:
+      # - ~/.ssh/id_ed25519:/root/.ssh/id_ed25519:ro
+      # - ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro
+      # - ~/.ssh/known_hosts:/root/.ssh/known_hosts:rw
+
+    # Environment variables (optional)
+    environment:
+      - NODE_ENV=production
+      # Add any custom environment variables here
+
+    # Network mode - use host network to access remote SSH servers
+    network_mode: host
+
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+
+    # Resource limits (optional but recommended)
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Healthcheck (optional - checks if node process is running)
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "node"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
